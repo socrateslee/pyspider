@@ -179,7 +179,7 @@ def save(project):
         }
         if project_info.get('status') in ('DEBUG', 'RUNNING', ):
             info['status'] = 'CHECKING'
-        projectdb.update(project, info)
+        projectdb.update(project, utils.unicode_obj(info))
     else:
         info = {
             'name': project,
@@ -188,7 +188,7 @@ def save(project):
             'rate': app.config.get('max_rate', 1),
             'burst': app.config.get('max_burst', 3),
         }
-        projectdb.insert(project, info)
+        projectdb.insert(project, utils.unicode_obj(info))
 
     rpc = app.config['scheduler_rpc']
     if rpc is not None:

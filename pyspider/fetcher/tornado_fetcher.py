@@ -104,6 +104,7 @@ class Fetcher(object):
             '1h': counter.CounterManager(
                 lambda: counter.TimebaseAverageWindowCounter(60, 60)),
         }
+        self._total_count = 0
 
     def send_result(self, type, task, result):
         '''Send fetch result to processor'''
@@ -114,6 +115,14 @@ class Fetcher(object):
                 logger.exception(e)
 
     def fetch(self, task, callback=None):
+        self._total_count += 1
+        if self._total_count % 100 == 0:
+            if self.async:
+                self.http_client = MyCurlAsyncHTTPClient(max_clients=self.poolsize,
+                                                         io_loop=self.ioloop)
+            else:
+                self.http_client = tornado.httpclient.HTTPClient(MyCurlAsyncHTTPClient, max_clients=self.poolsize)
+            
         if self.async:
             return self.async_fetch(task, callback)
         else:
